@@ -9,16 +9,15 @@ import java.awt.event.*;
 import java.awt.*;
 
 public class machineLearningProject {
-    static ArrayList<Point> points;
+    static ArrayList<Point> points = new ArrayList<Point>();
     static int[][] adjacencyMatrix;
     static int numberOfVertices;
     static int[] ordering;
     static double chunk;
-    public static String pattern1 = "^[1-9]\\d*$";
-    public static String pattern2 = "^[1-9]?[0-9]{1}$|^100$";
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
-
+        String pattern2 = "^[1-9]?[0-9]{1}$|^100$";
+        String pattern1 = "^[1-9]\\d*$";
         String PopulationInput = JOptionPane.showInputDialog(null, "Population Size");
         String numberOfGenerations = JOptionPane.showInputDialog(null, "number of generations");
         String crossOverRate = JOptionPane.showInputDialog(null, "crossover rate");
@@ -43,35 +42,67 @@ public class machineLearningProject {
         } else {
             JOptionPane.showMessageDialog(null, "one of the inputs is not a positive digit");
         }
-        // readline();
-
+        readFile();
     }
 
+    //Read input file and map coordinates into adjacencyMatrix 2D array
     public static void readFile() throws FileNotFoundException, IOException {
-        // pass the path to the file as a parameter
-        File file = new File("input.txt");
+        // pass the path to the file as a parameter 
+        File file = new File("input.txt"); 
         Scanner sc = new Scanner(file);
+        int highest = 0;
         while (sc.hasNextLine()) {
             String[] point = sc.nextLine().split(" ");
-            Point a = new Point(Double.parseDouble(point[0]), Double.parseDouble(point[1]));
+            int x = Integer.parseInt(point[0]);
+            int y = Integer.parseInt(point[1]);
+            if (x >= highest) highest = x;
+            else if (y >= highest) highest = y;
+            Point a = new Point(x, y);
             points.add(a);
-        }
+        } 
         sc.close();
+        
+        adjacencyMatrix = new int[highest+1][highest+1];
+        for (Point p : points) {
+            adjacencyMatrix[p.getX()][p.getY()] = 1;
+        }
+        printMatrix(highest);
     }
 
+    //print the matrix
+    public static void printMatrix(int highest) {
+        System.out.print("Adjacency Matrix\n  ");
+        for (int i = 0; i <= highest; i++) {
+            System.out.printf("%3d", i);
+        }
+        for (int i = 0; i < adjacencyMatrix.length; i++) {
+            System.out.printf("\n%2d", i);
+            for (int j = 0; j < adjacencyMatrix[0].length; j++) {
+                System.out.printf("%3d", adjacencyMatrix[i][j]);
+            }
+        }
+    }
 }
 
 class Point {
-    private double x;
-    private double y;
+    private int x;
+	private int y;
 
-    public Point(double x, double y) {
-        this.x = x;
-        this.y = y;
+	public Point(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	public String toString() {
+		return this.x + ":" + this.y;
+    }
+    
+    public int getX() {
+        return this.x;
     }
 
-    public String toString() {
-        return this.x + ":" + this.y;
+    public int getY() {
+        return this.y;
     }
 }
 
