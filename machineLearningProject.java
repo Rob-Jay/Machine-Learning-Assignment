@@ -14,17 +14,27 @@ public class machineLearningProject {
     static int numberOfVertices;
     static int[] ordering;
     static double chunk;
+    public static String pattern1 = "^[0-9]\\d*$";
+    public static String pattern2 = "^[1-9]?[0-9]{1}$|^100$";
 
-    public static void main(String[] args) throws FileNotFoundException, IOException {
-        String pattern2 = "^[1-9]?[0-9]{1}$|^100$";
-        String pattern1 = "^[1-9]\\d*$";
-        String PopulationInput = JOptionPane.showInputDialog(null, "Population Size");
+    public static void main(String[] args) throws Exception, FileNotFoundException, IOException {
+
+      validateInput();
+      //readFile();
+
+    }
+    public static void validateInput()throws Exception{
+        String populationInput = JOptionPane.showInputDialog(null, "Population Size");
         String numberOfGenerations = JOptionPane.showInputDialog(null, "number of generations");
         String crossOverRate = JOptionPane.showInputDialog(null, "crossover rate");
         String mutationRate = JOptionPane.showInputDialog(null, "mutation rate");
-        if (PopulationInput.matches(pattern1) && numberOfGenerations.matches(pattern1)
+        if(populationInput==null || numberOfGenerations==null || crossOverRate==null || mutationRate==null){
+            System.out.println("You canceled one of the options!");            
+            validateInput();
+        }
+        if (populationInput.matches(pattern1) && numberOfGenerations.matches(pattern1)
                 && crossOverRate.matches(pattern1) && mutationRate.matches(pattern1)) {
-            System.out.println(PopulationInput);
+            System.out.println(populationInput);
             System.out.println(numberOfGenerations);
             if (crossOverRate.matches(pattern2) && mutationRate.matches(pattern2)) {
                 System.out.println(crossOverRate);
@@ -33,16 +43,19 @@ public class machineLearningProject {
                 int mR = Integer.parseInt(mutationRate);
                 int sum = cR + mR;
                 if (sum > 100) {
-                    System.out.println("please input lower numbers for mutation rate and crossover rate");
+                    System.out.println("sum of mutation rate and crossover rate must be below 100"); 
+                    validateInput();
                 } else {
-                    System.out.println("the sum of cR and mR = " + sum);
+                    JOptionPane.showMessageDialog(null, "the sum of cR and mR = " + sum);
+                   
                 }
 
             }
-        } else {
-            JOptionPane.showMessageDialog(null, "one of the inputs is not a positive digit");
         }
-        readFile();
+         else {
+            JOptionPane.showMessageDialog(null, "one of the inputs is not a positive digit");
+            validateInput();
+        }
     }
 
     //Read input file and map coordinates into adjacencyMatrix 2D array
