@@ -14,8 +14,7 @@ public class machineLearningProject {
     static int numberOfVertices;
     static int[] ordering;
     static double chunk;
-    public static String pattern1 = "^[0-9]\\d*$";
-    public static String pattern2 = "^[1-9]?[0-9]{1}$|^100$";
+     
 
     public static void main(String[] args) throws Exception, FileNotFoundException, IOException {
 
@@ -24,6 +23,8 @@ public class machineLearningProject {
 
     }
     public static void validateInput()throws Exception{
+	String pattern1 = "^[0-9]\\d*$";
+     	String pattern2 = "^[1-9]?[0-9]{1}$|^100$";
         String populationInput = JOptionPane.showInputDialog(null, "Population Size");
         String numberOfGenerations = JOptionPane.showInputDialog(null, "number of generations");
         String crossOverRate = JOptionPane.showInputDialog(null, "crossover rate");
