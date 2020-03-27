@@ -14,16 +14,15 @@ public class machineLearningProject {
     static int numberOfVertices;
     static int[] ordering;
     static double chunk;
-    public static String pattern1 = "^[0-9]\\d*$";
-    public static String pattern2 = "^[1-9]?[0-9]{1}$|^100$";
-
+    
     public static void main(String[] args) throws Exception, FileNotFoundException, IOException {
-
       validateInput();
-      //readFile();
-
+      //readFile(); 
     }
+
     public static void validateInput()throws Exception{
+	    String pattern1 = "^[0-9]\\d*$";
+     	String pattern2 = "^[1-9]?[0-9]{1}$|^100$";
         String populationInput = JOptionPane.showInputDialog(null, "Population Size");
         String numberOfGenerations = JOptionPane.showInputDialog(null, "number of generations");
         String crossOverRate = JOptionPane.showInputDialog(null, "crossover rate");
@@ -42,18 +41,18 @@ public class machineLearningProject {
                 int cR = Integer.parseInt(crossOverRate);
                 int mR = Integer.parseInt(mutationRate);
                 int sum = cR + mR;
-                if (sum > 100) {
-                    System.out.println("sum of mutation rate and crossover rate must be below 100"); 
-                    validateInput();
+                if (sum <= 100) {
+                    System.out.println("the sum of cR and mR = " + sum); 
                 } else {
-                    JOptionPane.showMessageDialog(null, "the sum of cR and mR = " + sum);
+                   System.out.println("sum of mutation rate and crossover rate must be below 100"); 
+                    validateInput();
                    
                 }
 
             }
         }
          else {
-            JOptionPane.showMessageDialog(null, "one of the inputs is not a positive digit");
+            System.out.println("one of the inputs is not a positive digit");
             validateInput();
         }
     }
