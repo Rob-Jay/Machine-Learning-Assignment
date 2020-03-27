@@ -44,7 +44,7 @@ public class machineLearningProject {
                 int mR = Integer.parseInt(mutationRate);
                 int sum = cR + mR;
                 if (sum <= 100) {
-                    JOptionPane.showMessageDialog(null, "the sum of cR and mR = " + sum); 
+                    System.out.println("the sum of cR and mR = " + sum); 
                 } else {
                    System.out.println("sum of mutation rate and crossover rate must be below 100"); 
                     validateInput();
@@ -54,7 +54,7 @@ public class machineLearningProject {
             }
         }
          else {
-            JOptionPane.showMessageDialog(null, "one of the inputs is not a positive digit");
+            System.out.println("one of the inputs is not a positive digit");
             validateInput();
         }
     }
