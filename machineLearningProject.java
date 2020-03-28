@@ -97,6 +97,47 @@ public class machineLearningProject {
     }
 }
 
+
+ // 8.4 generated orderings by storing values in an arraylist and converting to string to compare
+ public static void generateOrdering(int n, int p) {
+    String result = "";
+    int randomValue;
+    StringBuffer sb = new StringBuffer();
+    ArrayList<String> ordering = new ArrayList<String>();
+    ArrayList<String> populationOrdering = new ArrayList<String>();
+
+    for (int j = 0; j < p; j++) {
+        // create an ordering
+        for (int i = 0; i != n; i++) {
+            randomValue = (int) (Math.random() * n + 1);
+            result = result + String.valueOf(randomValue);
+            if (!ordering.contains(result)) {
+                ordering.add(result);
+                result = "";
+            } else {
+                i = i - 1;
+            }
+            result = "";
+        }
+
+        // insert ordering into orderings
+        for (String s : ordering) {
+            sb.append(s + " ");
+        }
+        result = sb.toString();
+        if (!populationOrdering.contains(result)) {
+            populationOrdering.add(result);
+            System.out.println("Here is a population \t" + result);
+            result = "";
+        } else {
+            j = j - 1;
+            result = "";
+        }
+        ordering.clear();
+        sb.delete(0, sb.length());
+    }
+}
+
 class Point {
     private int x;
 	private int y;
