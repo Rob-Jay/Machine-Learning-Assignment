@@ -17,19 +17,21 @@ public class machineLearningProject {
     public static String pattern1 = "^[0-9]\\d*$";
     public static String pattern2 = "^[1-9]?[0-9]{1}$|^100$";
 
-    public static void main(String[] args) throws Exception, FileNotFoundException, IOException {
+    public static void main(final String[] args) throws Exception, FileNotFoundException, IOException {
 
-      validateInput();
-      //readFile();
+        validateInput();
+        // readFile();
 
     }
-    public static void validateInput()throws Exception{
-        String populationInput = JOptionPane.showInputDialog(null, "Population Size");
-        String numberOfGenerations = JOptionPane.showInputDialog(null, "number of generations");
-        String crossOverRate = JOptionPane.showInputDialog(null, "crossover rate");
-        String mutationRate = JOptionPane.showInputDialog(null, "mutation rate");
-        if(populationInput==null || numberOfGenerations==null || crossOverRate==null || mutationRate==null){
-            System.out.println("You canceled one of the options!");            
+
+    // Question 2 Inputs
+    public static void validateInput() throws Exception {
+        final String populationInput = JOptionPane.showInputDialog(null, "Population Size");
+        final String numberOfGenerations = JOptionPane.showInputDialog(null, "number of generations");
+        final String crossOverRate = JOptionPane.showInputDialog(null, "crossover rate");
+        final String mutationRate = JOptionPane.showInputDialog(null, "mutation rate");
+        if (populationInput == null || numberOfGenerations == null || crossOverRate == null || mutationRate == null) {
+            System.out.println("You canceled one of the options!");
             validateInput();
         }
         if (populationInput.matches(pattern1) && numberOfGenerations.matches(pattern1)
@@ -39,51 +41,53 @@ public class machineLearningProject {
             if (crossOverRate.matches(pattern2) && mutationRate.matches(pattern2)) {
                 System.out.println(crossOverRate);
                 System.out.println(mutationRate);
-                int cR = Integer.parseInt(crossOverRate);
-                int mR = Integer.parseInt(mutationRate);
-                int sum = cR + mR;
+                final int cR = Integer.parseInt(crossOverRate);
+                final int mR = Integer.parseInt(mutationRate);
+                final int sum = cR + mR;
                 if (sum > 100) {
-                    System.out.println("sum of mutation rate and crossover rate must be below 100"); 
+                    System.out.println("sum of mutation rate and crossover rate must be below 100");
                     validateInput();
                 } else {
                     JOptionPane.showMessageDialog(null, "the sum of cR and mR = " + sum);
-                   
+
                 }
 
             }
-        }
-         else {
+        } else {
             JOptionPane.showMessageDialog(null, "one of the inputs is not a positive digit");
             validateInput();
         }
     }
 
-    //Read input file and map coordinates into adjacencyMatrix 2D array
+    // Read input file and map coordinates into adjacencyMatrix 2D array
     public static void readFile() throws FileNotFoundException, IOException {
-        // pass the path to the file as a parameter 
-        File file = new File("input.txt"); 
-        Scanner sc = new Scanner(file);
+        // pass the path to the file as a parameter
+        final File file = new File("input.txt");
+        final Scanner sc = new Scanner(file);
         int highest = 0;
         while (sc.hasNextLine()) {
-            String[] point = sc.nextLine().split(" ");
-            int x = Integer.parseInt(point[0]);
-            int y = Integer.parseInt(point[1]);
-            if (x >= highest) highest = x;
-            else if (y >= highest) highest = y;
-            Point a = new Point(x, y);
+            final String[] point = sc.nextLine().split(" ");
+            final int x = Integer.parseInt(point[0]);
+            final int y = Integer.parseInt(point[1]);
+            if (x >= highest)
+                highest = x;
+            else if (y >= highest)
+                highest = y;
+            final Point a = new Point(x, y);
             points.add(a);
-        } 
+        }
         sc.close();
-        
-        adjacencyMatrix = new int[highest+1][highest+1];
-        for (Point p : points) {
+
+        // SIZE OF MATRIX
+        adjacencyMatrix = new int[highest + 1][highest + 1];
+        for (final Point p : points) {
             adjacencyMatrix[p.getX()][p.getY()] = 1;
         }
         printMatrix(highest);
     }
 
-    //print the matrix
-    public static void printMatrix(int highest) {
+    // print the matrix
+    public static void printMatrix(final int highest) {
         System.out.print("Adjacency Matrix\n  ");
         for (int i = 0; i <= highest; i++) {
             System.out.printf("%3d", i);
@@ -95,21 +99,61 @@ public class machineLearningProject {
             }
         }
     }
+
+    // 8.4
+    public static void generateOrdering(int n, int p) {
+        String result = "";
+        int randomValue;
+        StringBuffer sb = new StringBuffer();
+        ArrayList<String> ordering = new ArrayList<String>();
+        ArrayList<String> populationOrdering = new ArrayList<String>();
+
+        for (int j = 0; j < p; j++) {
+            // create an ordering
+            for (int i = 0; i != n; i++) {
+                randomValue = (int) (Math.random() * n + 1);
+                result = result + String.valueOf(randomValue);
+                if (!ordering.contains(result)) {
+                    ordering.add(result);
+                    result = "";
+                } else {
+                    i = i - 1;
+                }
+                result = "";
+            }
+
+            // insert ordering into orderings
+            for (String s : ordering) {
+                sb.append(s + " ");
+            }
+            result = sb.toString();
+            if (!populationOrdering.contains(result)) {
+                populationOrdering.add(result);
+                System.out.println("Here is a population \t" + result);
+                result = "";
+            } else {
+                j = j - 1;
+                result = "";
+            }
+            ordering.clear();
+            sb.delete(0, sb.length());
+        }
+    }
 }
 
 class Point {
-    private int x;
-	private int y;
+    private final int x;
+    private final int y;
 
-	public Point(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
-
-	public String toString() {
-		return this.x + ":" + this.y;
+    public Point(final int x, final int y) {
+        this.x = x;
+        this.y = y;
     }
-    
+
+    public String toString() {
+        return this.x + ":" + this.y;
+    }
+
     public int getX() {
         return this.x;
     }
@@ -123,7 +167,7 @@ class GraphVisualisation extends JFrame {
     private static final String TITLE = "Graph Visualisation";
     private static final int WIDTH = 960;
     private static final int HEIGHT = 960;
-    private int[][] adjacencyMatrix;
+    private final int[][] adjacencyMatrix;
     private final int numberOfVertices;
     private final int[] ordering;
     private final double chunk;
@@ -135,15 +179,15 @@ class GraphVisualisation extends JFrame {
         this.chunk = (Math.PI * 2) / ((double) numberOfVertices);
         setTitle(TITLE);
         setSize(WIDTH, HEIGHT);
-        setVisible(true);
+        setVisible(true);11
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    public void paint(Graphics g) {
+    public void paint(final Graphics g) {
         super.paint(g);
 
-        int radius = 100;
-        int mov = 200;
+        final int radius = 100;
+        final int mov = 200;
 
         for (int i = 0; i < this.numberOfVertices; i++) {
             for (int j = i + 1; j < this.numberOfVertices; j++) {
