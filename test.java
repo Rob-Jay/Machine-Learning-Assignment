@@ -3,6 +3,8 @@
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.text.DecimalFormat;
+import java.text.Format;
 
 import javax.sound.sampled.SourceDataLine;
 import javax.swing.*;
@@ -10,7 +12,7 @@ import java.io.*;
 import java.awt.event.*;
 import java.awt.*;
 
-public class machineLearningProject {
+public class test {
     static ArrayList<Point> points = new ArrayList<Point>();
     static int[][] adjacencyMatrix;
     static int[] ordering, numbers;
@@ -18,6 +20,7 @@ public class machineLearningProject {
     static int Cr, Mr, Pr;
     static int[][] currentPopulation, nextPopulation;
     static double chunk;
+    public static int countNextPopulation = 0;
     
     public static void main( String[] args) throws Exception, FileNotFoundException, IOException {
         
@@ -60,7 +63,20 @@ public class machineLearningProject {
                 currentPopulation = nextPopulation;
                 countNextPopulation = 0;
             }
+            
         }
+
+        ArrayList<Double> fitnessCost = new ArrayList<>();
+        int[] order;
+        for (int i = 0; i < nextPopulation.length; i++) {
+            order = nextPopulation[i];
+            calculateChunk(order);
+            double fitness = calculateFitness(order);
+            fitnessCost.add(fitness);
+        }
+        Collections.sort(fitnessCost);
+        System.out.println("Last Fitness Cost List:");
+        System.out.println(fitnessCost);
 
         double fitness = 50.0;
         ordering = nextPopulation[0];
@@ -79,7 +95,6 @@ public class machineLearningProject {
     }
 
     // function to add ordering into nextPopulation
-    public static int countNextPopulation = 0;
     public static void addToNextGeneration(int[] ordering) {
         nextPopulation[countNextPopulation] = ordering;
         countNextPopulation++;
@@ -208,6 +223,8 @@ public class machineLearningProject {
         }
         Collections.sort(fitnessCost);
         System.out.println(fitnessCost);
+        //Collections.sort(fitnessCost, Collections.reverseOrder());
+        //System.out.println(fitnessCost);
         int[][] tempPopulation = new int[P][N + 1];
         for(int i = 0; i < currentPopulation.length; i++) {
             int location = temp.indexOf(fitnessCost.get(i));
@@ -240,10 +257,10 @@ public class machineLearningProject {
     public static void validateInput() throws Exception {
         String pattern1 = "^[0-9]\\d*$";
         String pattern2 = "^[1-9]?[0-9]{1}$|^100$";
-         String populationInput = JOptionPane.showInputDialog(null, "Population Size");
-         String numberOfGenerations = JOptionPane.showInputDialog(null, "number of generations");
-         String crossOverRate = JOptionPane.showInputDialog(null, "crossover rate");
-         String mutationRate = JOptionPane.showInputDialog(null, "mutation rate");
+        String populationInput = JOptionPane.showInputDialog(null, "Population Size");
+        String numberOfGenerations = JOptionPane.showInputDialog(null, "number of generations");
+        String crossOverRate = JOptionPane.showInputDialog(null, "crossover rate");
+        String mutationRate = JOptionPane.showInputDialog(null, "mutation rate");
         if (populationInput == null || numberOfGenerations == null || crossOverRate == null || mutationRate == null) {
             System.out.println("You canceled one of the options!");
             validateInput();
@@ -269,7 +286,6 @@ public class machineLearningProject {
                     JOptionPane.showMessageDialog(null, "the sum of cR and mR = " + sum);
                     
                 }
-                
             } else {
                 JOptionPane.showMessageDialog(null, "crossover rate and mutation rate must be below 100");
                 validateInput();
@@ -375,23 +391,25 @@ public class machineLearningProject {
             currentPopulation[i][j] = Integer.parseInt(curPopulation[j]);
         }
     }
-    
-    public static void calculateXY() {
+
+    public static void calculateXY(int[] ordering) {
+        DecimalFormat df = new DecimalFormat("#.#####");
         points = new ArrayList<Point>();
-        for(int i = 0; i < N + 1; i++) {
-            double x = Math.cos(i * chunk);
-            double y = Math.sin(i * chunk);
+        for(int i = 0; i < ordering.length; i++) {
+            double x = Double.parseDouble(df.format(Math.cos(i * chunk)));
+            double y = Double.parseDouble(df.format(Math.sin(i * chunk)));
             points.add(new Point(x, y));
         }
     }
 
     // getting the distance of two points using pythagoras equation a^2 = b^2 + c^2
     public static double getDistance(Point p1, Point p2) {
+        DecimalFormat df = new DecimalFormat("#.#####");
         double a = p1.getY() * p1.getY();
         double b = p2.getX() * p2.getX();
         
         //System.out.println("Distance between " + p1.toString() + " and " + p2.toString() + " = " + Math.sqrt(a + b));
-        return Math.sqrt(a + b);
+        return Double.parseDouble(df.format(Math.sqrt(a + b)));
     }
 
     public static void calculateChunk(int[] ordering) {
@@ -408,19 +426,82 @@ public class machineLearningProject {
     
     // Fitness calculted unsing the distance between two points as mentioned in the spec
     public static double calculateFitness(int[] ordering) {
-        calculateXY();
-        double sum = 0;
+        calculateXY(ordering);
+        double minimumNodeDistance = 1;
+        //double minimumNodeDistanceSum = 0.0;
+        for(int i = 0; i < ordering.length; i++) {
+            for(int j = 0; j < ordering.length; j++ ) {
+                double length = getDistance(points.get(i), points.get(j));
+                if(length <= minimumNodeDistance) {
+                    minimumNodeDistance = length;
+                    //minimumNodeDistanceSum += length;
+                }
+            }
+        }
+        //double sumMinimumNodeDistances = minimumNodeDistance * ordering.length;
+        //System.out.println("Sum of Minimum Node Distances:" + minimumNodeDistanceSum);
+        //System.out.println("Minimum Node Distance:" + minimumNodeDistance);
+        int possibleCrossingEdge = 0;
+        double sum = 0.0;
         for(int i = 0; i < adjacencyMatrix.length; i++) {
             for(int j = 0; j < adjacencyMatrix[i].length / 2; j++) {
                 if(adjacencyMatrix[i][j] == 1) {
                     int index1 = getPositionOf(ordering, i);
                     int index2 = getPositionOf(ordering, j);
-                    sum += getDistance(points.get(index2), points.get(index1));
+                    double distance = getDistance(points.get(index2), points.get(index1));
+                    //System.out.println("Distance:" + distance);
+                    if(distance > minimumNodeDistance) {
+                        possibleCrossingEdge++;
+                        //sum += distance;
+                    }
                 }
             }
         }
+        //System.out.println("EdgeLengthDiviation:" + sum);
+        sum += possibleCrossingEdge + 0.0;
+        //System.out.println("Sum of distances:" + sum);
         return sum;
-    }
+    } 
+
+    /* public static double calculateFitness(int[] ordering) {
+        calculateXY(ordering);
+        double minimumNodeDistance = 1;
+        double minimumNodeDistanceSum = 0.0;
+        for(int i = 0; i < ordering.length; i++) {
+            for(int j = 0; j < ordering.length; j++ ) {
+                double length = getDistance(points.get(i), points.get(j));
+                if(length <= minimumNodeDistance) {
+                    minimumNodeDistance = length;
+                    minimumNodeDistanceSum += length;
+                }
+                
+            }
+        }
+        //double sumMinimumNodeDistances = minimumNodeDistance * ordering.length;
+        System.out.println("Sum of Minimum Node Distances:" + minimumNodeDistanceSum);
+        System.out.println("Minimum Node Distance:" + minimumNodeDistance);
+        int possibleCrossingEdge = 0;
+        double result = 0.0, sum = 0.0, distance = 0.0;
+        for(int i = 0; i < adjacencyMatrix.length; i++) {
+            for(int j = 0; j < adjacencyMatrix[i].length / 2; j++) {
+                if(adjacencyMatrix[i][j] == 1) {
+                    int index1 = getPositionOf(ordering, i);
+                    int index2 = getPositionOf(ordering, j);
+                    distance = getDistance(points.get(index2), points.get(index1));
+                    System.out.println(distance);
+                    if(distance > minimumNodeDistance) {
+                        possibleCrossingEdge++;
+                        sum += distance;
+                    }
+                }
+            }
+        }
+        System.out.println("EdgeLengthDiviation:" + sum);
+        sum += possibleCrossingEdge + 0.0;
+        System.out.println("Sum of distances + possibleEdges:" + sum);
+        System.out.println();
+        return sum;
+    }  */
 }
 
 class Point {
@@ -430,6 +511,10 @@ class Point {
     public Point( double x,  double y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Point() {
+        
     }
     
     public String toString() {
@@ -466,9 +551,9 @@ class GraphVisualisation extends JFrame {
     }
     
     public void paint( Graphics g) {
-         int radius = 100;
-         int mov = 200;
-        
+        int radius = 100;
+        int mov = 200;
+
         for (int i = 0; i < this.numberOfVertices; i++) {
             for (int j = i + 1; j < this.numberOfVertices; j++) {
                 if (this.adjacencyMatrix[this.ordering[i]][this.ordering[j]] == 1) {
