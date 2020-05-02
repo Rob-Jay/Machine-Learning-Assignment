@@ -26,7 +26,7 @@ public class is16165365 {
     static int countNextPopulationE = 0;
     static int Cr, Mr, Pr;
     static int[][] currentPopulationD, currentPopulationE, nextPopulationD, nextPopulationE;
-    static double chunk;
+    static double chunk, optimalDistance;
     
     public static void main( String[] args) throws Exception, FileNotFoundException, IOException {
         
@@ -75,18 +75,31 @@ public class is16165365 {
                 }
             }
             currentPopulationD = nextPopulationD;
-            currentPopulationE = nextPopulationE;
             countNextPopulationD = 0;
-            countNextPopulationE = 0;
-            orderingDistance = getBestOrdering("D");
-            orderingEdge = getBestOrdering("E");
+            int[] orderingD = getBestOrdering("D");
+            if(calculateFitnessDistance(orderingD) == optimalDistance) {
+                finish = true;
+                System.out.println("Fitness Distance solution found in " + i + " generation");
+                printOrdering(orderingD);
+                break;
+            }
             gv1.chunk = chunk;
-            gv1.numberOfVertices = orderingDistance.length;
-            gv1.ordering = orderingDistance;
+            gv1.numberOfVertices = orderingD.length;
+            gv1.ordering = orderingD;
             gv1.repaint();
+
+            currentPopulationE = nextPopulationE;
+            countNextPopulationE = 0;
+            int[] orderingE = getBestOrdering("E");
+            if(calculateFitnessEdge(orderingE) == 0) {
+                finish = true;
+                System.out.println("Fitness Edge solution found in " + i + " generation");
+                printOrdering(orderingE);
+                break;
+            }
             gv2.chunk = chunk;
-            gv2.numberOfVertices = orderingEdge.length;
-            gv2.ordering = orderingEdge;
+            gv2.numberOfVertices = orderingE.length;
+            gv2.ordering = orderingE;
             gv2.repaint();
         }
     }
@@ -103,8 +116,8 @@ public class is16165365 {
                     ordering = nextPopulationD[i];
                 }
             }
-            printOrdering(ordering);
-            System.out.println("\nDistance Fitness: " + fitness);
+            //printOrdering(ordering);
+            //System.out.println("\nDistance Fitness: " + fitness);
             return ordering;
         } else {
             int[] ordering = nextPopulationE[0];
@@ -115,8 +128,8 @@ public class is16165365 {
                     ordering = nextPopulationE[i];
                 }
             }
-            printOrdering(ordering);
-            System.out.println("\nEdge Fitness: " + fitness);
+            //printOrdering(ordering);
+            //System.out.println("\nEdge Fitness: " + fitness);
             return ordering;
         }
     }
@@ -529,12 +542,14 @@ public class is16165365 {
     public static double calculateFitnessEdge(int[] ordering) {
         calculateXY(ordering);
         double minimumNodeDistance = 10;
+        optimalDistance = 0.0
         for(int i = 0; i < ordering.length; i++) {
             for(int j = i + 1; j < ordering.length; j++ ) {
                 if(i == ordering.length - 1) j = 0;
                 double length = getDistance(points.get(i), points.get(j));
                 if(length <= minimumNodeDistance) {
                     minimumNodeDistance = length;
+                    optimalDistance += length;
                 }
             }
         }
