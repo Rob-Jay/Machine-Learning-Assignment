@@ -59,7 +59,7 @@ public class test {
                 }
                 
             }
-            if(i < G -1) {
+            if(i < G - 1) {
                 currentPopulation = nextPopulation;
                 countNextPopulation = 0;
             }
@@ -77,9 +77,8 @@ public class test {
         Collections.sort(fitnessCost);
         System.out.println("Last Fitness Cost List:");
         System.out.println(fitnessCost);
-
+        
         double fitness = 50.0;
-        ordering = nextPopulation[0];
         for (int[] test : nextPopulation) {
             double currentFitness = calculateFitness(test);
             if(currentFitness <= fitness) {
@@ -92,6 +91,7 @@ public class test {
         System.out.println(calculateFitness(ordering));
         //GraphVisualisation gv = new GraphVisualisation(adjacencyMatrix, ordering, ordering.length);
         new GraphVisualisation(adjacencyMatrix, ordering, ordering.length);
+        //new GraphVisualisation(adjacencyMatrix, nextPopulation[1], nextPopulation[1].length);
     }
 
     // function to add ordering into nextPopulation
@@ -393,7 +393,7 @@ public class test {
     }
 
     public static void calculateXY(int[] ordering) {
-        DecimalFormat df = new DecimalFormat("#.#####");
+        DecimalFormat df = new DecimalFormat("#.######");
         points = new ArrayList<Point>();
         for(int i = 0; i < ordering.length; i++) {
             double x = Double.parseDouble(df.format(Math.cos(i * chunk)));
@@ -404,12 +404,12 @@ public class test {
 
     // getting the distance of two points using pythagoras equation a^2 = b^2 + c^2
     public static double getDistance(Point p1, Point p2) {
-        DecimalFormat df = new DecimalFormat("#.#####");
-        double a = p1.getY() * p1.getY();
-        double b = p2.getX() * p2.getX();
+        DecimalFormat df = new DecimalFormat("#.######");
+        double ac = Math.abs(p2.getY() - p1.getY());
+        double cb = Math.abs(p2.getX() - p1.getX());
         
         //System.out.println("Distance between " + p1.toString() + " and " + p2.toString() + " = " + Math.sqrt(a + b));
-        return Double.parseDouble(df.format(Math.sqrt(a + b)));
+        return Double.parseDouble(df.format(Math.hypot(ac, cb)));
     }
 
     public static void calculateChunk(int[] ordering) {
@@ -423,85 +423,34 @@ public class test {
         }
         return -1;
     }
-    
-    // Fitness calculted unsing the distance between two points as mentioned in the spec
+
     public static double calculateFitness(int[] ordering) {
         calculateXY(ordering);
-        double minimumNodeDistance = 1;
-        //double minimumNodeDistanceSum = 0.0;
+        double minimumNodeDistance = 10;
         for(int i = 0; i < ordering.length; i++) {
-            for(int j = 0; j < ordering.length; j++ ) {
+            for(int j = i + 1; j < ordering.length; j++ ) {
+                if(i == ordering.length - 1) j = 0;
                 double length = getDistance(points.get(i), points.get(j));
                 if(length <= minimumNodeDistance) {
                     minimumNodeDistance = length;
-                    //minimumNodeDistanceSum += length;
                 }
             }
         }
-        //double sumMinimumNodeDistances = minimumNodeDistance * ordering.length;
-        //System.out.println("Sum of Minimum Node Distances:" + minimumNodeDistanceSum);
-        //System.out.println("Minimum Node Distance:" + minimumNodeDistance);
         int possibleCrossingEdge = 0;
-        double sum = 0.0;
         for(int i = 0; i < adjacencyMatrix.length; i++) {
             for(int j = 0; j < adjacencyMatrix[i].length / 2; j++) {
                 if(adjacencyMatrix[i][j] == 1) {
                     int index1 = getPositionOf(ordering, i);
                     int index2 = getPositionOf(ordering, j);
-                    double distance = getDistance(points.get(index2), points.get(index1));
-                    //System.out.println("Distance:" + distance);
+                    double distance = getDistance(points.get(index1), points.get(index2));
                     if(distance > minimumNodeDistance) {
                         possibleCrossingEdge++;
-                        //sum += distance;
                     }
                 }
             }
         }
-        //System.out.println("EdgeLengthDiviation:" + sum);
-        sum += possibleCrossingEdge + 0.0;
-        //System.out.println("Sum of distances:" + sum);
-        return sum;
-    } 
-
-    /* public static double calculateFitness(int[] ordering) {
-        calculateXY(ordering);
-        double minimumNodeDistance = 1;
-        double minimumNodeDistanceSum = 0.0;
-        for(int i = 0; i < ordering.length; i++) {
-            for(int j = 0; j < ordering.length; j++ ) {
-                double length = getDistance(points.get(i), points.get(j));
-                if(length <= minimumNodeDistance) {
-                    minimumNodeDistance = length;
-                    minimumNodeDistanceSum += length;
-                }
-                
-            }
-        }
-        //double sumMinimumNodeDistances = minimumNodeDistance * ordering.length;
-        System.out.println("Sum of Minimum Node Distances:" + minimumNodeDistanceSum);
-        System.out.println("Minimum Node Distance:" + minimumNodeDistance);
-        int possibleCrossingEdge = 0;
-        double result = 0.0, sum = 0.0, distance = 0.0;
-        for(int i = 0; i < adjacencyMatrix.length; i++) {
-            for(int j = 0; j < adjacencyMatrix[i].length / 2; j++) {
-                if(adjacencyMatrix[i][j] == 1) {
-                    int index1 = getPositionOf(ordering, i);
-                    int index2 = getPositionOf(ordering, j);
-                    distance = getDistance(points.get(index2), points.get(index1));
-                    System.out.println(distance);
-                    if(distance > minimumNodeDistance) {
-                        possibleCrossingEdge++;
-                        sum += distance;
-                    }
-                }
-            }
-        }
-        System.out.println("EdgeLengthDiviation:" + sum);
-        sum += possibleCrossingEdge + 0.0;
-        System.out.println("Sum of distances + possibleEdges:" + sum);
-        System.out.println();
-        return sum;
-    }  */
+        return possibleCrossingEdge;
+    }
 }
 
 class Point {

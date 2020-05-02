@@ -1,9 +1,8 @@
-
-// useful link https://github.com/knazir/SimpleGA
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import java.text.DecimalFormat;
+import java.text.Format;
 import javax.sound.sampled.SourceDataLine;
 import javax.swing.*;
 import java.io.*;
@@ -14,7 +13,8 @@ public class machineLearningProject {
     static ArrayList<Point> points = new ArrayList<Point>();
     static int[][] adjacencyMatrix;
     static int[] ordering, numbers;
-    static int N, P, G; // also numberOfVertices
+    static int N, P, G;
+    static int countNextPopulation = 0;// also numberOfVertices
     static int Cr, Mr, Pr;
     static int[][] currentPopulation, nextPopulation;
     static double chunk;
@@ -56,14 +56,26 @@ public class machineLearningProject {
                 }
                 
             }
-            if(i < G -1) {
+            if(i < G - 1) {
                 currentPopulation = nextPopulation;
                 countNextPopulation = 0;
             }
+            
         }
 
+        ArrayList<Double> fitnessCost = new ArrayList<>();
+        int[] order;
+        for (int i = 0; i < nextPopulation.length; i++) {
+            order = nextPopulation[i];
+            calculateChunk(order);
+            double fitness = calculateFitness(order);
+            fitnessCost.add(fitness);
+        }
+        Collections.sort(fitnessCost);
+        System.out.println("Last Fitness Cost List:");
+        System.out.println(fitnessCost);
+        
         double fitness = 50.0;
-        ordering = nextPopulation[0];
         for (int[] test : nextPopulation) {
             double currentFitness = calculateFitness(test);
             if(currentFitness <= fitness) {
@@ -76,10 +88,10 @@ public class machineLearningProject {
         System.out.println(calculateFitness(ordering));
         //GraphVisualisation gv = new GraphVisualisation(adjacencyMatrix, ordering, ordering.length);
         new GraphVisualisation(adjacencyMatrix, ordering, ordering.length);
+        //new GraphVisualisation(adjacencyMatrix, nextPopulation[1], nextPopulation[1].length);
     }
 
     // function to add ordering into nextPopulation
-    public static int countNextPopulation = 0;
     public static void addToNextGeneration(int[] ordering) {
         nextPopulation[countNextPopulation] = ordering;
         countNextPopulation++;
@@ -235,7 +247,6 @@ public class machineLearningProject {
         }
     }
     
-    
     // Question 2 Inputs
     public static void validateInput() throws Exception {
         String pattern1 = "^[0-9]\\d*$";
@@ -375,23 +386,25 @@ public class machineLearningProject {
             currentPopulation[i][j] = Integer.parseInt(curPopulation[j]);
         }
     }
-    
-    public static void calculateXY() {
+
+    // getting the distance of two points using pythagoras equation a^2 = b^2 + c^2
+    public static void calculateXY(int[] ordering) {
+        DecimalFormat df = new DecimalFormat("#.######");
         points = new ArrayList<Point>();
-        for(int i = 0; i < N + 1; i++) {
-            double x = Math.cos(i * chunk);
-            double y = Math.sin(i * chunk);
+        for(int i = 0; i < ordering.length; i++) {
+            double x = Double.parseDouble(df.format(Math.cos(i * chunk)));
+            double y = Double.parseDouble(df.format(Math.sin(i * chunk)));
             points.add(new Point(x, y));
         }
     }
 
     // getting the distance of two points using pythagoras equation a^2 = b^2 + c^2
     public static double getDistance(Point p1, Point p2) {
-        double a = p1.getY() * p1.getY();
-        double b = p2.getX() * p2.getX();
+        DecimalFormat df = new DecimalFormat("#.######");
+        double ac = Math.abs(p2.getY() - p1.getY());
+        double cb = Math.abs(p2.getX() - p1.getX());
         
-        //System.out.println("Distance between " + p1.toString() + " and " + p2.toString() + " = " + Math.sqrt(a + b));
-        return Math.sqrt(a + b);
+        return Double.parseDouble(df.format(Math.hypot(ac, cb)));
     }
 
     public static void calculateChunk(int[] ordering) {
@@ -408,7 +421,7 @@ public class machineLearningProject {
     
     // Fitness calculted unsing the distance between two points as mentioned in the spec
     public static double calculateFitness(int[] ordering) {
-        calculateXY();
+        calculateXY(ordering);
         double sum = 0;
         for(int i = 0; i < adjacencyMatrix.length; i++) {
             for(int j = 0; j < adjacencyMatrix[i].length / 2; j++) {
