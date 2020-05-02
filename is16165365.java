@@ -38,7 +38,10 @@ public class is16165365 {
         nextPopulationE = new int[P][N + 1];
         generateOrdering();
         populateNumbers();
-
+        GraphVisualisation gv1 = new GraphVisualisation("Total Distance Fuction");
+        GraphVisualisation gv2 = new GraphVisualisation("Total Edge Fuction");
+        gv1.adjacencyMatrix = adjacencyMatrix;
+        gv2.adjacencyMatrix = adjacencyMatrix;
         for (int i = 0; i < G; i++) {
             //fitnessCostDistance = new ArrayList<>();
             //selection(currentPopulationD, "D");
@@ -71,39 +74,21 @@ public class is16165365 {
                     }
                 }
             }
-            if(i < G - 1) {
-                currentPopulationD = nextPopulationD;
-                currentPopulationE = nextPopulationE;
-                countNextPopulationD = 0;
-                countNextPopulationE = 0;
-            }
-            
+            currentPopulationD = nextPopulationD;
+            currentPopulationE = nextPopulationE;
+            countNextPopulationD = 0;
+            countNextPopulationE = 0;
+            orderingDistance = getBestOrdering("D");
+            orderingEdge = getBestOrdering("E");
+            gv1.chunk = chunk;
+            gv1.numberOfVertices = orderingDistance.length;
+            gv1.ordering = orderingDistance;
+            gv1.repaint();
+            gv2.chunk = chunk;
+            gv2.numberOfVertices = orderingEdge.length;
+            gv2.ordering = orderingEdge;
+            gv2.repaint();
         }
-
-        ArrayList<Double> fitnessCostD = new ArrayList<>();
-        ArrayList<Double> fitnessCostE = new ArrayList<>();
-        for (int i = 0; i < nextPopulationE.length; i++) {
-            int[] orderD = nextPopulationD[i];
-            int[] orderE = nextPopulationE[i];
-            calculateChunk(orderE);
-            double fitnessD = calculateFitnessDistance(orderD);
-            double fitnessE = calculateFitnessEdge(orderE);
-            fitnessCostD.add(fitnessD);
-            fitnessCostE.add(fitnessE);
-        }
-        Collections.sort(fitnessCostD);
-        System.out.println("Last Fitness Cost List Distance:");
-        System.out.println(fitnessCostD);
-        Collections.sort(fitnessCostE);
-        System.out.println();
-        System.out.println("Last Fitness Cost List Edge:");
-        System.out.println(fitnessCostE);
-
-        orderingDistance = getBestOrdering("D");
-        orderingEdge = getBestOrdering("E");
-
-        new GraphVisualisation("Total Distance Fuction", adjacencyMatrix, orderingDistance, orderingDistance.length);
-        new GraphVisualisation("Total Edge Fuction", adjacencyMatrix, orderingEdge, orderingEdge.length); 
     }
 
     public static int[] getBestOrdering(String functionSwitch) {
@@ -119,7 +104,7 @@ public class is16165365 {
                 }
             }
             printOrdering(ordering);
-            System.out.println("\n" + fitness);
+            System.out.println("\nDistance Fitness: " + fitness);
             return ordering;
         } else {
             int[] ordering = nextPopulationE[0];
@@ -131,7 +116,7 @@ public class is16165365 {
                 }
             }
             printOrdering(ordering);
-            System.out.println("\n" + fitness);
+            System.out.println("\nEdge Fitness: " + fitness);
             return ordering;
         }
     }
@@ -559,10 +544,8 @@ public class is16165365 {
                 if(adjacencyMatrix[i][j] == 1) {
                     int index1 = getPositionOf(ordering, i);
                     int index2 = getPositionOf(ordering, j);
-                    double errorMargin = minimumNodeDistance + (minimumNodeDistance * 0.05);
                     double distance = getDistance(points.get(index1), points.get(index2));
-                    if(distance < errorMargin && distance > minimumNodeDistance) ;
-                    else possibleCrossingEdge++;
+                    if(distance > minimumNodeDistance) possibleCrossingEdge++;
                 }
             }
         }
@@ -594,19 +577,15 @@ class Point {
 
 class GraphVisualisation extends JFrame {
     private String TITLE = "Graph Visualisation ";
-    private static  int WIDTH = 960;
-    private static  int HEIGHT = 960;
-    private  int[][] adjacencyMatrix;
-    private  int numberOfVertices;
-    private  int[] ordering;
-    private  double chunk;
-    
-    public GraphVisualisation(String title, int[][] adjacencyMatrix,  int[] ordering,  int numberOfVertices) {
+    private int WIDTH = 360;
+    private int HEIGHT = 360;
+    int[][] adjacencyMatrix;
+    int numberOfVertices;
+    int[] ordering;
+    double chunk;
+
+    public GraphVisualisation(String title) {
         this.TITLE = this.TITLE + title;
-        this.adjacencyMatrix = adjacencyMatrix;
-        this.ordering = ordering;
-        this.numberOfVertices = numberOfVertices;
-        this.chunk = (Math.PI * 2) / ((double) numberOfVertices);
         setTitle(TITLE);
         setSize(WIDTH, HEIGHT);
         setVisible(true);
@@ -614,8 +593,9 @@ class GraphVisualisation extends JFrame {
     }
     
     public void paint( Graphics g) {
-         int radius = 100;
-         int mov = 200;
+        super.paint(g);
+        int radius = 100;
+        int mov = 200;
         
         for (int i = 0; i < this.numberOfVertices; i++) {
             for (int j = i + 1; j < this.numberOfVertices; j++) {
