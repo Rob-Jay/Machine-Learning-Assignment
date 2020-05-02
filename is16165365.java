@@ -116,8 +116,8 @@ public class is16165365 {
                     ordering = nextPopulationD[i];
                 }
             }
-            //printOrdering(ordering);
-            //System.out.println("\nDistance Fitness: " + fitness);
+            printOrdering(ordering);
+            System.out.println("\nDistance Fitness: " + fitness);
             return ordering;
         } else {
             int[] ordering = nextPopulationE[0];
@@ -128,8 +128,8 @@ public class is16165365 {
                     ordering = nextPopulationE[i];
                 }
             }
-            //printOrdering(ordering);
-            //System.out.println("\nEdge Fitness: " + fitness);
+            printOrdering(ordering);
+            System.out.println("\nEdge Fitness: " + fitness);
             return ordering;
         }
     }
@@ -283,62 +283,6 @@ public class is16165365 {
                 currentPopulation[i] = tempPopulation[j];
                 j++;
             }
-        }
-    }
-    
-    // Order the currentPopulation according to the best fitness cost (lowest number) to the worst fitness cost (higest number)
-    // Divide the currentPopulation into 3 sections s1, s2, s3 from best orderings to worst ordering. 
-    // From that replaces the worst section (s3) with the best orderings (s1)
-    /* public static void selection() {
-        ArrayList<Double> fitnessCostDistance = new ArrayList<>();
-        ArrayList<Double> fitnessCostEdge =  new ArrayList<>();
-        ArrayList<Double> tempD = new ArrayList<>();
-        ArrayList<Double> tempE = new ArrayList<>();
-        int[] orderD, orderE;
-        for (int i = 0; i < currentPopulationD.length; i++) {
-            orderD = currentPopulationD[i];
-            orderE = currentPopulationE[i];
-            double fitnessD = calculateFitnessDistance(orderD);
-            double fitnessE = calculateFitnessEdge(orderE);
-            fitnessCostDistance.add(fitnessD);
-            fitnessCostEdge.add(fitnessE);
-            tempD.add(fitnessD);
-            tempE.add(fitnessE);
-        }
-        Collections.sort(fitnessCostDistance);
-        System.out.println(fitnessCostDistance);
-        Collections.sort(fitnessCostEdge);
-        System.out.println(fitnessCostEdge);
-
-        int[][] tempPopulationD = new int[P][N + 1];
-        int[][] tempPopulationE = new int[P][N + 1];
-        for(int i = 0; i < currentPopulationD.length; i++) {
-            int locationD = tempD.indexOf(fitnessCostDistance.get(i));
-            tempPopulationD[i] = currentPopulationD[locationD];
-            int locationE = tempE.indexOf(fitnessCostEdge.get(i));
-            tempPopulationE[i] = currentPopulationE[locationE];
-        }
-
-        // Replacing the worst section with the best section
-        orderD = tempPopulationD[0];
-        orderE = tempPopulationE[0];
-        int j = 0;
-        double selNum = currentPopulationD.length * 2/3; 
-        for(int i = 0; i < currentPopulationD.length; i++) {
-            if (i + 0.0 < selNum) {
-                currentPopulationD[i] = tempPopulationD[i];
-                currentPopulationE[i] = tempPopulationE[i];
-            } else if(i + 0.0 >= selNum) {
-                currentPopulationD[i] = tempPopulationD[j];
-                currentPopulationE[i] = tempPopulationE[j];
-                j++;
-            }
-        }
-    } */
-
-    public static void printPop(int[][] pop) {
-        for (int[] is : pop) {
-            printOrdering(is);
         }
     }
     
@@ -542,7 +486,7 @@ public class is16165365 {
     public static double calculateFitnessEdge(int[] ordering) {
         calculateXY(ordering);
         double minimumNodeDistance = 10;
-        optimalDistance = 0.0
+        optimalDistance = 0.0;
         for(int i = 0; i < ordering.length; i++) {
             for(int j = i + 1; j < ordering.length; j++ ) {
                 if(i == ordering.length - 1) j = 0;
